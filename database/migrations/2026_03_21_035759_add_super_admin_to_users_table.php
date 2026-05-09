@@ -9,14 +9,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_super_admin')->default(false)->after('role');
+            if (Schema::hasColumn('users', 'is_super_admin')) {
+                $table->dropColumn('is_super_admin');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('is_super_admin');
+            $table->boolean('is_super_admin')->default(false)->after('role');
         });
     }
 };

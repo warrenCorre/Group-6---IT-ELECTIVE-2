@@ -1,88 +1,111 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Members - Group 6')
+@section('title', 'Create Member - Group 6')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
-    <div class="text-center mb-8">
-        <h2 class="text-4xl font-light text-white/90">Manage Members</h2>
+<div class="max-w-4xl mx-auto px-4">
+    <div class="text-center mb-6">
+        <h2 class="text-4xl font-light text-white/90">Create Member</h2>
         <div class="h-0.5 w-20 bg-indigo-800/60 mx-auto mt-2"></div>
     </div>
 
-    <div class="flex justify-end mb-6">
-        <a href="{{ route('admin.members.create') }}" class="btn-primary inline-flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i>
-            Create New Member
-        </a>
-    </div>
+    <div class="flex justify-center">
+        <div class="member-card w-full max-w-2xl p-6">
+            <form method="POST" action="{{ route('admin.members.store') }}" enctype="multipart/form-data" class="space-y-4">
+                @csrf
 
-    @if($users->count() > 0)
-    <div class="members-grid">
-        @foreach($users as $user)
-        <div class="member-card">
-            <div class="profile-avatar">
-                @if($user->profile_photo)
-                    <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}">
-                @else
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=80" alt="{{ $user->name }}">
-                @endif
-            </div>
-            
-            <h3 class="text-2xl font-medium text-white">{{ $user->name }}</h3>
-            <div class="text-indigo-300 text-sm font-semibold capitalize mt-0.5">{{ $user->role }}</div>
-            
-            <div class="info-line">
-                <i class="fa-regular fa-envelope"></i>
-                <span>{{ $user->email }}</span>
-            </div>
-            
-            @if($user->age)
-            <div class="info-line">
-                <i class="fa-regular fa-calendar"></i>
-                <span>{{ $user->age }} y.o.</span>
-            </div>
-            @endif
-            
-            <div class="bio-text">
-                {{ Str::limit($user->bio ?? 'No bio provided.', 50) }}
-            </div>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-1/3 text-center">
+                        <div class="profile-avatar mx-auto mb-3">
+                            <img src="https://ui-avatars.com/api/?name=New+Member&background=3b5570&color=fff&size=80"
+                                 alt="Preview" id="preview" class="w-full h-full object-cover">
+                        </div>
 
-            <div class="mt-4 flex gap-2 justify-center">
-                @if(auth()->user()->id !== $user->id)
-                    @if(!$user->isAdmin() || auth()->user()->isAdmin())
-                        <a href="{{ route('admin.members.edit', $user) }}" class="btn-primary text-sm px-4 py-2">
-                            Edit
-                        </a>
-                    @endif
-                    
-                    @if(!$user->isAdmin())
-                        <form method="POST" action="{{ route('admin.members.destroy', $user) }}" onsubmit="return confirm('Are you sure you want to delete this member?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-danger text-sm px-4 py-2">
-                                Delete
-                            </button>
-                        </form>
-                    @endif
-                @endif
-            </div>
-            
-            @if($user->id === auth()->user()->id)
-                <div class="text-xs text-blue-400 mt-2">
-                    <i class="fa-solid fa-user"></i> This is you
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Profile Photo</label>
+                            <input type="file" name="profile_photo" id="profile_photo"
+                                   class="form-input text-sm py-1.5" accept="image/*">
+                            <p class="text-xs text-slate-500 mt-0.5">Max 2MB</p>
+                            @error('profile_photo') <p class="text-red-400 text-xs mt-0.5">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="md:w-2/3 space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Name</label>
+                            <input type="text" name="name" value="{{ old('name') }}"
+                                   class="form-input py-1.5" placeholder="Full name" required>
+                            @error('name') <p class="text-red-400 text-xs mt-0.5">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Email</label>
+                            <input type="email" name="email" value="{{ old('email') }}"
+                                   class="form-input py-1.5" placeholder="email@example.com" required>
+                            @error('email') <p class="text-red-400 text-xs mt-0.5">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Password</label>
+                            <input type="password" name="password"
+                                   class="form-input py-1.5" placeholder="Min. 6 characters" required>
+                            @error('password') <p class="text-red-400 text-xs mt-0.5">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
                 </div>
-            @endif
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Role</label>
+                        <select name="role" class="form-select py-1.5" required>
+                            <option value="" disabled {{ old('role') ? '' : 'selected' }}>Select a role</option>
+                            @foreach($roles as $role)
+                                <option value="{{ $role }}" {{ old('role') == $role ? 'selected' : '' }}>{{ $role }}</option>
+                            @endforeach
+                        </select>
+                        @error('role') <p class="text-red-400 text-xs mt-0.5">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Age</label>
+                        <input type="number" name="age" value="{{ old('age') }}"
+                               class="form-input py-1.5" placeholder="e.g., 20">
+                        @error('age') <p class="text-red-400 text-xs mt-0.5">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Bio</label>
+                    <textarea name="bio" rows="2" class="form-textarea py-1.5"
+                              placeholder="Brief description...">{{ old('bio') }}</textarea>
+                    @error('bio') <p class="text-red-400 text-xs mt-0.5">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="btn-primary flex-1 py-2 text-sm">
+                        Create Member
+                    </button>
+                    <a href="{{ route('admin.members') }}" class="btn-primary flex-1 text-center py-2 text-sm">
+                        Cancel
+                    </a>
+                </div>
+            </form>
         </div>
-        @endforeach
     </div>
-    @else
-    <div class="text-center py-12">
-        <div class="member-card p-8 max-w-md mx-auto">
-            <i class="fa-regular fa-users text-5xl text-slate-500 mb-4"></i>
-            <h3 class="text-2xl text-slate-300 mb-2">No Members Found</h3>
-            <p class="text-slate-400">There are no members to display.</p>
-        </div>
-    </div>
-    @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.getElementById('profile_photo')?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+@endpush
