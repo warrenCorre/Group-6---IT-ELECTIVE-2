@@ -13,7 +13,7 @@ class UsersTableSeeder extends Seeder
         // admin
         User::create([
             'name'          => 'Team Manager',
-            'email'         => 'admin@team.com',
+            'email'         => 'warhokcorre@gmail.com',
             'password'      => Hash::make('admin123'),
             'role'          => 'Admin',
             'age'           => 28,
@@ -24,7 +24,7 @@ class UsersTableSeeder extends Seeder
         // warren
         User::create([
             'name'          => 'Warren Corre',
-            'email'         => 'warren@groupni.com',
+            'email'         => 'corzzw@gmail.com',
             'password'      => Hash::make('warren123'),
             'role'          => 'Developer',
             'age'           => 20,
@@ -35,7 +35,7 @@ class UsersTableSeeder extends Seeder
         // che
         User::create([
             'name'          => 'Cherry Ann Cagoco',
-            'email'         => 'cherry@groupni.com',
+            'email'         => 'cherryanncagoco@gmail.com',
             'password'      => Hash::make('cherry123'),
             'role'          => 'Designer',
             'age'           => 20,
@@ -46,7 +46,7 @@ class UsersTableSeeder extends Seeder
         // alang
         User::create([
             'name'          => 'Ageneth Balahay',
-            'email'         => 'ageneth@groupni.com',
+            'email'         => 'agenethdalen@gmail.com',
             'password'      => Hash::make('alang123'),
             'role'          => 'QA Tester',
             'age'           => 20,
@@ -57,7 +57,7 @@ class UsersTableSeeder extends Seeder
         // angel
         User::create([
             'name'          => 'Angel Mae Quinlog',
-            'email'         => 'angel@groupni.com',
+            'email'         => 'quinlogangelmae80@gmail.com',
             'password'      => Hash::make('angel123'),
             'role'          => 'Project Manager',
             'age'           => 20,

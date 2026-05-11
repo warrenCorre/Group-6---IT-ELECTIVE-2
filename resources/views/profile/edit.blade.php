@@ -3,67 +3,88 @@
 @section('title', 'Edit Profile - Group 6')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="max-w-3xl mx-auto">
+
+    {{-- Header --}}
     <div class="text-center mb-8">
-        <h2 class="text-4xl font-light text-white/90">Edit Profile</h2>
-        <div class="h-0.5 w-20 bg-indigo-800/60 mx-auto mt-2"></div>
+        <div class="eyebrow mb-3">Account</div>
+        <h2 class="section-title">Edit Profile</h2>
+        <div class="section-divider"></div>
     </div>
 
     <div class="flex justify-center">
         <div class="member-card w-full max-w-md p-8">
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 @method('PUT')
-                
-                <div class="mb-6 text-center">
-                    <div class="profile-avatar mx-auto">
-                        @if($user->profile_photo)
-                            <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}" id="preview">
-                        @else
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=80" alt="{{ $user->name }}" id="preview">
-                        @endif
+
+                {{-- Avatar upload --}}
+                <div class="text-center mb-2">
+                    <div class="relative inline-block">
+                        <div class="profile-avatar mx-auto" style="width: 100px; height: 100px; margin-bottom: 10px;">
+                            @if($user->profile_photo)
+                                <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}" id="preview">
+                            @else
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=100" alt="{{ $user->name }}" id="preview">
+                            @endif
+                        </div>
+                        <label for="profile_photo"
+                               class="absolute bottom-1 right-0 w-8 h-8 rounded-full bg-blue-600 border-2 border-slate-900 flex items-center justify-center cursor-pointer hover:bg-blue-500 transition-colors shadow-lg"
+                               title="Change photo">
+                            <i class="fa-solid fa-camera text-xs text-white"></i>
+                        </label>
                     </div>
-                    
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-slate-400 mb-2">Profile Photo</label>
-                        <input type="file" name="profile_photo" id="profile_photo" class="form-input" accept="image/*">
-                        <p class="text-xs text-slate-500 mt-1">Max 2MB. JPG, PNG, GIF</p>
-                    </div>
+                    <input type="file" name="profile_photo" id="profile_photo" class="hidden" accept="image/*">
+                    <p class="text-slate-600 text-xs mt-2">JPG, PNG, GIF · max 2MB</p>
+                    @error('profile_photo') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Name</label>
-                    <input type="text" name="name" value="{{ old('name', $user->name) }}" 
+                {{-- Divider --}}
+                <div class="h-px bg-gradient-to-r from-transparent via-slate-700/50 to-transparent"></div>
+
+                {{-- Name --}}
+                <div>
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" value="{{ old('name', $user->name) }}"
                            class="form-input" placeholder="Full name" required>
                     @error('name') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Email</label>
-                    <input type="email" name="email" value="{{ old('email', $user->email) }}" 
+                {{-- Email --}}
+                <div>
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}"
                            class="form-input" placeholder="email@example.com" required>
                     @error('email') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Age</label>
-                    <input type="number" name="age" value="{{ old('age', $user->age) }}" 
-                           class="form-input" placeholder="e.g., 25">
+                {{-- Age --}}
+                <div>
+                    <label class="form-label">Age</label>
+                    <input type="number" name="age" value="{{ old('age', $user->age) }}"
+                           class="form-input" placeholder="e.g. 25" min="1" max="99">
                     @error('age') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Bio</label>
-                    <textarea name="bio" rows="4" class="form-textarea" 
+                {{-- Bio --}}
+                <div>
+                    <label class="form-label">Bio</label>
+                    <textarea name="bio" rows="4" class="form-textarea"
                               placeholder="Tell us about yourself...">{{ old('bio', $user->bio) }}</textarea>
                     @error('bio') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="flex gap-4">
-                    <button type="submit" class="btn-primary flex-1">
-                        Update Profile
+                {{-- Divider --}}
+                <div class="h-px bg-gradient-to-r from-transparent via-slate-700/50 to-transparent"></div>
+
+                {{-- Actions --}}
+                <div class="flex gap-3 pt-1">
+                    <button type="submit" class="btn-primary flex-1 py-3">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
                     </button>
-                    <a href="{{ route('profile.show') }}" class="btn-primary flex-1 text-center">
+                    <a href="{{ route('profile.show') }}"
+                       class="btn-primary flex-1 py-3 text-center"
+                       style="background: linear-gradient(145deg, #1e2a3a, #151f2e); border-color: rgba(60,80,110,0.5);">
                         Cancel
                     </a>
                 </div>
@@ -75,15 +96,13 @@
 
 @push('scripts')
 <script>
-    document.getElementById('profile_photo')?.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('preview').src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-    });
+document.getElementById('profile_photo')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => { document.getElementById('preview').src = e.target.result; };
+        reader.readAsDataURL(file);
+    }
+});
 </script>
 @endpush
