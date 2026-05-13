@@ -69,7 +69,6 @@
             mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 80%);
         }
 
-        /* ── Animated gradient background (preserved exactly) ── */
         body::before {
             content: '';
             position: fixed;
@@ -141,7 +140,6 @@
             border: 1px solid transparent;
             transition: all 0.2s ease;
             letter-spacing: 0.02em;
-            position: relative;
         }
         .nav-link:hover {
             color: var(--text-primary);
@@ -161,14 +159,19 @@
             overflow: hidden;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 0 0 0 rgba(106, 158, 255, 0);
         }
         .nav-avatar:hover {
             border-color: var(--accent-blue-bright);
             box-shadow: 0 0 0 3px rgba(106, 158, 255, 0.15), 0 0 16px rgba(106, 158, 255, 0.2);
             transform: scale(1.05);
         }
-        .nav-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* FIX: nav avatar img must fill the circle */
+        .nav-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
         .nav-logout-btn {
             font-size: 0.88rem; font-weight: 500;
@@ -213,6 +216,12 @@
                 inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
+        /* ── FIX: grid-card needs overflow:visible so "You" badge shows ── */
+        .member-card.grid-card {
+            position: relative;
+            overflow: visible;
+        }
+
         /* ── Profile avatar ── */
         .profile-avatar {
             width: 88px; height: 88px;
@@ -222,7 +231,7 @@
             box-shadow:
                 0 0 0 4px rgba(79, 122, 166, 0.12),
                 0 12px 24px rgba(0,0,0,0.5);
-            overflow: hidden;
+            overflow: hidden;  /* FIX: ensures img is clipped to circle */
             background: linear-gradient(145deg, #1d3048, #111e2e);
             transition: all 0.3s ease;
             position: relative;
@@ -237,9 +246,56 @@
             border-color: var(--accent-blue-bright);
             box-shadow: 0 0 0 4px rgba(106, 158, 255, 0.2), 0 12px 24px rgba(0,0,0,0.5);
         }
-        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* FIX: img inside profile-avatar must fill and cover the circle */
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
-        /* ── Role badge ── */
+        /* ── Member card text ── */
+        .member-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.01em;
+        }
+
+        .member-role {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+            opacity: 0.9;
+        }
+
+        /* ── Badges ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .badge-blue {
+            background: rgba(79, 122, 166, 0.15);
+            border: 1px solid rgba(79, 122, 166, 0.35);
+            color: #7ab0e8;
+        }
+        .badge-purple {
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+        }
+
+        /* ── Role badge (legacy) ── */
         .role-badge {
             display: inline-block;
             font-size: 0.72rem;
@@ -252,6 +308,28 @@
             border: 1px solid rgba(99, 102, 241, 0.25);
             color: #a5b4fc;
             margin-top: 4px;
+        }
+
+        /* ── Section headings ── */
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: rgba(232, 240, 255, 0.92);
+        }
+        .section-heading {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: rgba(232, 240, 255, 0.92);
+        }
+        .section-divider {
+            height: 2px; width: 40px;
+            background: linear-gradient(90deg, var(--accent-indigo), transparent);
+            border-radius: 2px;
+            margin: 10px auto 0;
         }
 
         /* ── Info lines ── */
@@ -345,9 +423,7 @@
         }
 
         /* ── Forms ── */
-        .form-group {
-            display: flex; flex-direction: column; gap: 6px;
-        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-label {
             font-size: 0.8rem;
             font-weight: 500;
@@ -385,8 +461,6 @@
         }
         .form-select option { background: #0d1420; color: var(--text-primary); }
         .form-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
-        .form-error { font-size: 0.76rem; color: #ff8080; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
-        .form-error::before { content: '⚠'; font-size: 0.7rem; }
 
         /* ── Buttons ── */
         .btn-primary {
@@ -468,37 +542,11 @@
         }
         .alert-icon { font-size: 1rem; flex-shrink: 0; }
 
-        /* ── Section headings ── */
-        .section-heading {
-            font-family: 'Syne', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            color: rgba(232, 240, 255, 0.92);
-        }
-        .section-divider {
-            height: 2px; width: 40px;
-            background: linear-gradient(90deg, var(--accent-indigo), transparent);
-            border-radius: 2px;
-            margin: 10px auto 0;
-        }
-
         /* ── Page enter animation ── */
-        .page-content {
-            animation: pageIn 0.4s ease both;
-        }
+        .page-content { animation: pageIn 0.4s ease both; }
         @keyframes pageIn {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── Staggered card animations ── */
-        .member-card {
-            animation: cardIn 0.5s ease both;
-        }
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* ── Scrollbar ── */
@@ -536,12 +584,16 @@
 
         <div class="flex items-center gap-3">
             @auth
+                {{-- FIX: fetch fresh user from DB for nav avatar so it shows the updated photo --}}
+                @php $navUser = App\Models\User::find(auth()->id()); @endphp
                 <a href="{{ route('profile.show') }}">
                     <div class="nav-avatar">
-                        @if(auth()->user()->profile_photo)
-                            <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="{{ auth()->user()->name }}">
+                        @if($navUser && $navUser->profile_photo)
+                            <img src="{{ asset('storage/' . $navUser->profile_photo) }}"
+                                 alt="{{ $navUser->name }}">
                         @else
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=1d3048&color=7aa8f0&size=72" alt="{{ auth()->user()->name }}">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=1d3048&color=7aa8f0&size=72"
+                                 alt="{{ auth()->user()->name }}">
                         @endif
                     </div>
                 </a>

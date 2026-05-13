@@ -12,31 +12,29 @@ class ProfileController extends Controller
 {
     public function show()
     {
-        // Always re-fetch from DB so we get the latest profile_photo
-        $user = User::find(Auth::id());
+        // Always fetch fresh from DB — Auth::user() returns a cached copy
+        $user = User::findOrFail(Auth::id());
         return view('profile.show', compact('user'));
     }
 
     public function edit()
     {
-        // Always re-fetch from DB so the edit form shows the current photo
-        $user = User::find(Auth::id());
+        // Always fetch fresh from DB so the current photo is shown
+        $user = User::findOrFail(Auth::id());
         return view('profile.edit', compact('user'));
     }
 
     public function update(Request $request)
     {
-        $user = User::find(Auth::id());
+        $user = User::findOrFail(Auth::id());
 
-        $rules = [
+        $request->validate([
             'name'          => 'required|string|max:255',
             'email'         => 'required|email|unique:users,email,' . $user->id,
             'bio'           => 'nullable|string',
             'age'           => 'nullable|integer|min:1|max:150',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ];
-
-        $request->validate($rules);
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
 
         $data = [
             'name'  => $request->name,
@@ -46,20 +44,18 @@ class ProfileController extends Controller
         ];
 
         if ($request->hasFile('profile_photo')) {
-            // Delete old photo if it exists
-            if ($user->profile_photo) {
+            // Delete the old photo file from disk
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
                 Storage::disk('public')->delete($user->profile_photo);
             }
-
-            // Store new photo and save path
+            // Store new photo under storage/app/public/profiles/
             $path = $request->file('profile_photo')->store('profiles', 'public');
             $data['profile_photo'] = $path;
         }
 
         $user->update($data);
 
-        // Re-login the user so Auth::user() reflects the updated model
-        // (the session guard caches the old model; this forces a fresh load)
+        // Force the session guard to use the updated model so the nav avatar refreshes
         Auth::setUser($user->fresh());
 
         return redirect()->route('profile.show')->with('success', 'Profile updated successfully.');
@@ -72,7 +68,7 @@ class ProfileController extends Controller
             'password'         => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::find(Auth::id());
+        $user = User::findOrFail(Auth::id());
 
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.']);

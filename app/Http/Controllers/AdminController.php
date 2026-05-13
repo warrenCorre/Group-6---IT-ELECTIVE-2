@@ -11,7 +11,6 @@ class AdminController extends Controller
 {
     public function members()
     {
-        // Show ALL users EXCEPT the current logged-in admin
         $currentUser = auth()->user();
         $users = User::where('id', '!=', $currentUser->id)
                       ->orderBy('name')
@@ -35,7 +34,7 @@ class AdminController extends Controller
             'role'          => 'required|string|in:Developer,Designer,QA Tester,Project Manager',
             'age'           => 'nullable|integer|min:1|max:150',
             'bio'           => 'nullable|string',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $data = [
@@ -62,12 +61,13 @@ class AdminController extends Controller
         $currentUser = auth()->user();
 
         if ($user->id === $currentUser->id) {
-            return redirect()->route('admin.members')->with('error', 'Use Profile page to edit your own account.');
+            return redirect()->route('admin.members')
+                ->with('error', 'Use Profile page to edit your own account.');
         }
 
         $roles = ['Developer', 'Designer', 'QA Tester', 'Project Manager'];
 
-        // Always use a fresh model so the current profile_photo is shown
+        // Always use fresh model to ensure profile_photo is current
         $user = $user->fresh();
 
         return view('admin.edit-member', compact('user', 'roles'));
@@ -78,7 +78,8 @@ class AdminController extends Controller
         $currentUser = auth()->user();
 
         if ($user->id === $currentUser->id) {
-            return redirect()->route('admin.members')->with('error', 'Use Profile page to edit your own account.');
+            return redirect()->route('admin.members')
+                ->with('error', 'Use Profile page to edit your own account.');
         }
 
         $request->validate([
@@ -87,7 +88,7 @@ class AdminController extends Controller
             'role'          => 'required|string|in:Developer,Designer,QA Tester,Project Manager',
             'age'           => 'nullable|integer|min:1|max:150',
             'bio'           => 'nullable|string',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $data = [
@@ -99,11 +100,10 @@ class AdminController extends Controller
         ];
 
         if ($request->hasFile('profile_photo')) {
-            // Delete old photo from storage first
-            if ($user->profile_photo) {
+            // Delete the old photo from disk before saving the new one
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
                 Storage::disk('public')->delete($user->profile_photo);
             }
-
             $path = $request->file('profile_photo')->store('profiles', 'public');
             $data['profile_photo'] = $path;
         }
@@ -118,10 +118,11 @@ class AdminController extends Controller
         $currentUser = auth()->user();
 
         if ($user->id === $currentUser->id) {
-            return redirect()->route('admin.members')->with('error', 'You cannot delete your own account.');
+            return redirect()->route('admin.members')
+                ->with('error', 'You cannot delete your own account.');
         }
 
-        if ($user->profile_photo) {
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
             Storage::disk('public')->delete($user->profile_photo);
         }
 
