@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class LoginController extends Controller
 {
     /**
-     * Maximum login attempts before lockout.
+     * Maximum failed attempts before lockout.
      */
     protected int $maxAttempts = 3;
 
@@ -35,19 +35,18 @@ class LoginController extends Controller
         // Find the user by email
         $user = User::where('email', $credentials['email'])->first();
 
-        // If user exists, check lockout status
         if ($user) {
             // Check if account is currently locked out
             if ($user->locked_until && Carbon::now()->lessThan($user->locked_until)) {
-                $remaining = Carbon::now()->diffInMinutes($user->locked_until, false);
-                $remaining = max(1, (int) ceil($remaining));
+                $remaining = (int) ceil(Carbon::now()->diffInMinutes($user->locked_until, false));
+                $remaining = max(1, $remaining);
 
                 return back()->withErrors([
-                    'email' => "Your account has been temporarily locked due to too many failed login attempts. Please try again in {$remaining} minute(s), or use \"Forgot Password\" to reset your password.",
+                    'email' => "Your account is temporarily locked due to too many failed attempts. Try again in {$remaining} minute(s), or use \"Forgot Password\" to reset your password.",
                 ])->onlyInput('email');
             }
 
-            // If lockout has expired, reset counters
+            // If lockout has naturally expired, reset counters
             if ($user->locked_until && Carbon::now()->greaterThanOrEqualTo($user->locked_until)) {
                 $user->failed_login_attempts = 0;
                 $user->locked_until          = null;
@@ -69,19 +68,18 @@ class LoginController extends Controller
             return redirect()->intended('/');
         }
 
-        // Authentication failed — increment attempt counter
+        // Authentication failed — track failed attempt
         if ($user) {
             $user->failed_login_attempts = ($user->failed_login_attempts ?? 0) + 1;
 
             if ($user->failed_login_attempts >= $this->maxAttempts) {
                 // Lock the account
                 $user->locked_until          = Carbon::now()->addMinutes($this->lockoutMinutes);
-                $user->failed_login_attempts = 0; // reset counter after locking
-
+                $user->failed_login_attempts = 0;
                 $user->save();
 
                 return back()->withErrors([
-                    'email' => "Too many failed login attempts. Your account has been locked for {$this->lockoutMinutes} minutes. You can also use \"Forgot Password\" to reset your password.",
+                    'email' => "Too many failed attempts. Your account has been locked for {$this->lockoutMinutes} minutes. You can also use \"Forgot Password\" to reset your password.",
                 ])->onlyInput('email');
             }
 
@@ -90,11 +88,11 @@ class LoginController extends Controller
             $attemptsLeft = $this->maxAttempts - $user->failed_login_attempts;
 
             return back()->withErrors([
-                'email' => "The provided credentials do not match our records. You have {$attemptsLeft} attempt(s) remaining before your account is temporarily locked.",
+                'email' => "Incorrect credentials. You have {$attemptsLeft} attempt(s) remaining before your account is temporarily locked.",
             ])->onlyInput('email');
         }
 
-        // User not found (no email match) — generic error, no attempt tracking
+        // No matching email — generic error
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
