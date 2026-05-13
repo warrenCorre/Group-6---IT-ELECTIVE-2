@@ -12,15 +12,27 @@
         <div class="section-divider"></div>
     </div>
 
+    {{-- Success / Error flash --}}
+    @if(session('success'))
+        <div class="mb-6 max-w-sm mx-auto px-4 py-3 rounded-lg bg-green-900/40 border border-green-700/50 text-green-300 text-sm text-center">
+            <i class="fa-solid fa-circle-check mr-1"></i> {{ session('success') }}
+        </div>
+    @endif
+
     <div class="flex justify-center">
         <div class="member-card w-full max-w-sm p-8 text-center">
 
             {{-- Avatar --}}
             <div class="profile-avatar mx-auto" style="width: 100px; height: 100px; margin-bottom: 18px;">
                 @if($user->profile_photo)
-                    <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}">
+                    {{-- FIX: added w-full h-full object-cover so the stored photo fills the avatar circle --}}
+                    <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                         alt="{{ $user->name }}"
+                         class="w-full h-full object-cover rounded-full">
                 @else
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=100" alt="{{ $user->name }}">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=100"
+                         alt="{{ $user->name }}"
+                         class="w-full h-full object-cover rounded-full">
                 @endif
             </div>
 

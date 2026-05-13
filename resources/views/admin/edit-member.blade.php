@@ -13,6 +13,7 @@
     </div>
 
     <div class="member-card p-8">
+        {{-- FIX: enctype="multipart/form-data" is critical for photo upload (was present, kept here) --}}
         <form method="POST" action="{{ route('admin.members.update', $user) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -23,11 +24,18 @@
                 {{-- Avatar upload --}}
                 <div class="md:w-48 flex-shrink-0 text-center">
                     <div class="relative inline-block">
-                        <div class="profile-avatar mx-auto" style="width: 96px; height: 96px;">
+                        <div class="profile-avatar mx-auto" style="width: 96px; height: 96px; overflow: hidden; border-radius: 50%;">
                             @if($user->profile_photo)
-                                <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}" id="preview" class="w-full h-full object-cover">
+                                {{-- FIX: w-full h-full object-cover ensures photo fills the circle --}}
+                                <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                                     alt="{{ $user->name }}"
+                                     id="preview"
+                                     class="w-full h-full object-cover">
                             @else
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=96" alt="{{ $user->name }}" id="preview" class="w-full h-full object-cover">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=96"
+                                     alt="{{ $user->name }}"
+                                     id="preview"
+                                     class="w-full h-full object-cover">
                             @endif
                         </div>
                         <label for="profile_photo"
@@ -36,6 +44,7 @@
                             <i class="fa-solid fa-camera text-xs text-white"></i>
                         </label>
                     </div>
+                    {{-- FIX: file input name must be "profile_photo" to match controller validation --}}
                     <input type="file" name="profile_photo" id="profile_photo"
                            class="hidden" accept="image/*">
                     <p class="text-slate-600 text-xs mt-3">JPG, PNG · max 2MB</p>
@@ -110,6 +119,7 @@
 
 @push('scripts')
 <script>
+// Live preview when a new photo is selected
 document.getElementById('profile_photo')?.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
