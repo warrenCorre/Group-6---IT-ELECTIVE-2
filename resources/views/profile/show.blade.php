@@ -26,7 +26,7 @@
             <div class="profile-avatar mx-auto" style="width: 100px; height: 100px; margin-bottom: 18px;">
                 @if($user->profile_photo)
                     {{-- FIX: added w-full h-full object-cover so the stored photo fills the avatar circle --}}
-                    <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                    <img src="{{ url('storage-file/' . $user->profile_photo) }}"
                          alt="{{ $user->name }}"
                          class="w-full h-full object-cover rounded-full">
                 @else
@@ -104,7 +104,6 @@
 
         <form method="POST" action="{{ route('profile.password.update') }}" class="space-y-5">
             @csrf
-            @method('PUT')
 
             <div>
                 <label class="form-label">Current Password</label>

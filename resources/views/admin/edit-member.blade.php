@@ -13,10 +13,9 @@
     </div>
 
     <div class="member-card p-8">
-        {{-- FIX: enctype="multipart/form-data" is critical for photo upload (was present, kept here) --}}
+        {{-- enctype="multipart/form-data" is critical for photo upload --}}
         <form method="POST" action="{{ route('admin.members.update', $user) }}" enctype="multipart/form-data">
             @csrf
-            @method('PUT')
 
             {{-- Top row: avatar + core fields --}}
             <div class="flex flex-col md:flex-row gap-8 mb-6">
@@ -27,7 +26,7 @@
                         <div class="profile-avatar mx-auto" style="width: 96px; height: 96px; overflow: hidden; border-radius: 50%;">
                             @if($user->profile_photo)
                                 {{-- FIX: w-full h-full object-cover ensures photo fills the circle --}}
-                                <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                                <img src="{{ url('storage-file/' . $user->profile_photo) }}"
                                      alt="{{ $user->name }}"
                                      id="preview"
                                      class="w-full h-full object-cover">

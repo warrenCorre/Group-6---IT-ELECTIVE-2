@@ -37,14 +37,14 @@
             {{-- Avatar --}}
             <div class="profile-avatar">
                 @if($user->profile_photo)
-                    <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="{{ $user->name }}">
+                    <img src="{{ url('storage-file/' . $user->profile_photo) }}" alt="{{ $user->name }}">
                 @else
                     <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3b5570&color=fff&size=84" alt="{{ $user->name }}">
                 @endif
             </div>
 
             {{-- Name & role --}}
-            <h3 class="member-name mt-1">{{ $user->name }}</h3>
+            <h3 class="member-name mt-1 border-b-5">{{ $user->name }}</h3>
             <div class="mt-1.5">
                 @if($user->isAdmin())
                     <span class="badge badge-purple">
@@ -90,7 +90,6 @@
                         <form method="POST" action="{{ route('admin.members.destroy', $user) }}"
                               onsubmit="return confirm('Delete {{ addslashes($user->name) }}? This cannot be undone.');">
                             @csrf
-                            @method('DELETE')
                             <button type="submit" class="btn-danger text-xs px-4 py-2">
                                 <i class="fa-solid fa-trash-can text-xs"></i> Delete
                             </button>

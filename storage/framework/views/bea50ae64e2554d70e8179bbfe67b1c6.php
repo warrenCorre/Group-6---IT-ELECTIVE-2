@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Group 6 • IT Elective 2')</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title><?php echo $__env->yieldContent('title', 'Group 6 • IT Elective 2'); ?></title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -559,7 +559,7 @@
         /* ── Utility ── */
         .spacer-nav { height: var(--nav-height); }
     </style>
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
     <!-- Background layers -->
@@ -571,80 +571,80 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="flex items-center gap-6">
-            <a href="{{ route('home') }}" class="nav-brand">G6 · IT Elec 2</a>
+            <a href="<?php echo e(route('home')); ?>" class="nav-brand">G6 · IT Elec 2</a>
             <div class="hidden md:flex items-center gap-1">
-                <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
-                <a href="{{ route('team.public') }}" class="nav-link {{ request()->routeIs('team.public') ? 'active' : '' }}">View Team</a>
-                @auth
-                    @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.members') }}" class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">Manage Members</a>
-                    @endif
-                @endauth
+                <a href="<?php echo e(route('home')); ?>" class="nav-link <?php echo e(request()->routeIs('home') ? 'active' : ''); ?>">Home</a>
+                <a href="<?php echo e(route('team.public')); ?>" class="nav-link <?php echo e(request()->routeIs('team.public') ? 'active' : ''); ?>">View Team</a>
+                <?php if(auth()->guard()->check()): ?>
+                    <?php if(auth()->user()->isAdmin()): ?>
+                        <a href="<?php echo e(route('admin.members')); ?>" class="nav-link <?php echo e(request()->routeIs('admin.*') ? 'active' : ''); ?>">Manage Members</a>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            @auth
-                {{-- FIX: fetch fresh user from DB for nav avatar so it shows the updated photo --}}
-                @php $navUser = App\Models\User::find(auth()->id()); @endphp
-                <a href="{{ route('profile.show') }}">
+            <?php if(auth()->guard()->check()): ?>
+                
+                <?php $navUser = App\Models\User::find(auth()->id()); ?>
+                <a href="<?php echo e(route('profile.show')); ?>">
                     <div class="nav-avatar">
-                        @if($navUser && $navUser->profile_photo)
-                            <img src="{{ url('storage-file/' . $navUser->profile_photo) }}"
-                                 alt="{{ $navUser->name }}">
-                        @else
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=1d3048&color=7aa8f0&size=72"
-                                 alt="{{ auth()->user()->name }}">
-                        @endif
+                        <?php if($navUser && $navUser->profile_photo): ?>
+                            <img src="<?php echo e(url('storage-file/' . $navUser->profile_photo)); ?>"
+                                 alt="<?php echo e($navUser->name); ?>">
+                        <?php else: ?>
+                            <img src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(auth()->user()->name)); ?>&background=1d3048&color=7aa8f0&size=72"
+                                 alt="<?php echo e(auth()->user()->name); ?>">
+                        <?php endif; ?>
                     </div>
                 </a>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('logout')); ?>" class="inline">
+                    <?php echo csrf_field(); ?>
                     <button type="submit" class="nav-logout-btn">Logout</button>
                 </form>
-            @else
-                <a href="{{ route('login') }}" class="btn-primary btn-sm">
+            <?php else: ?>
+                <a href="<?php echo e(route('login')); ?>" class="btn-primary btn-sm">
                     <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                     Login
                 </a>
-            @endauth
+            <?php endif; ?>
         </div>
     </nav>
 
     <div class="spacer-nav"></div>
 
     <!-- Flash messages -->
-    @if(session('success') || session('error') || $errors->any())
+    <?php if(session('success') || session('error') || $errors->any()): ?>
         <div class="max-w-5xl mx-auto px-6 mt-5">
-            @if(session('success'))
+            <?php if(session('success')): ?>
                 <div class="alert alert-success">
                     <i class="fa-solid fa-circle-check alert-icon"></i>
-                    <span>{{ session('success') }}</span>
+                    <span><?php echo e(session('success')); ?></span>
                 </div>
-            @endif
-            @if(session('error'))
+            <?php endif; ?>
+            <?php if(session('error')): ?>
                 <div class="alert alert-error">
                     <i class="fa-solid fa-circle-exclamation alert-icon"></i>
-                    <span>{{ session('error') }}</span>
+                    <span><?php echo e(session('error')); ?></span>
                 </div>
-            @endif
-            @if($errors->any())
+            <?php endif; ?>
+            <?php if($errors->any()): ?>
                 <div class="alert alert-error">
                     <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
                     <ul style="margin:0;padding:0;list-style:none;">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
-    @endif
+    <?php endif; ?>
 
     <div class="page-content px-4 md:px-6 pb-20">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </div>
 
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
-</html>
+</html><?php /**PATH C:\xampp\htdocs\Group_6_@IT_Elective_2\resources\views/layouts/app.blade.php ENDPATH**/ ?>

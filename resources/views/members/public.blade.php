@@ -23,7 +23,7 @@
             {{-- Avatar --}}
             <div class="profile-avatar">
                 @if($member->profile_photo)
-                    <img src="{{ asset('storage/' . $member->profile_photo) }}" alt="{{ $member->name }}">
+                    <img src="{{ url('storage-file/' . $member->profile_photo) }}" alt="{{ $member->name }}">
                 @else
                     <img src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=3b5570&color=fff&size=84" alt="{{ $member->name }}">
                 @endif

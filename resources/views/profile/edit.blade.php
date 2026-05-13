@@ -15,10 +15,9 @@
     <div class="flex justify-center">
         <div class="member-card w-full max-w-md p-8">
 
-            {{-- FIX: enctype="multipart/form-data" is required for file upload (was present, kept here) --}}
+            {{-- enctype="multipart/form-data" is required for file upload --}}
             <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-5">
                 @csrf
-                @method('PUT')
 
                 {{-- Avatar upload --}}
                 <div class="text-center mb-2">
@@ -26,7 +25,7 @@
                         <div class="profile-avatar mx-auto" style="width: 100px; height: 100px; margin-bottom: 10px; overflow: hidden; border-radius: 50%;">
                             @if($user->profile_photo)
                                 {{-- FIX: added w-full h-full object-cover so stored photo fills the circle --}}
-                                <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                                <img src="{{ url('storage-file/' . $user->profile_photo) }}"
                                      alt="{{ $user->name }}"
                                      id="preview"
                                      class="w-full h-full object-cover">

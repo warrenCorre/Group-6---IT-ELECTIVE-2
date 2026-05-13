@@ -12,6 +12,17 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+// Storage proxy – serves files from storage/app/public directly.
+// This bypasses the Windows symlink issue when using `php artisan serve`.
+Route::get('/storage-file/{folder}/{filename}', function (string $folder, string $filename) {
+    $path = storage_path('app/public/' . $folder . '/' . $filename);
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    $mime = mime_content_type($path);
+    return response()->file($path, ['Content-Type' => $mime]);
+})->where(['folder' => '[a-zA-Z0-9_\-]+', 'filename' => '[a-zA-Z0-9_\-\.]+'])->name('storage.file');
+
 // Public View Team - Anyone can view (no login required)
 Route::get('/team', [MemberController::class, 'publicIndex'])->name('team.public');
 
@@ -40,8 +51,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name('show');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
-        Route::put('/update', [ProfileController::class, 'update'])->name('update');
-        Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+        Route::post('/update', [ProfileController::class, 'update'])->name('update');
+        Route::post('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
     });
 
     // Admin routes
@@ -50,7 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/members/create', [AdminController::class, 'createMember'])->name('members.create');
         Route::post('/members', [AdminController::class, 'storeMember'])->name('members.store');
         Route::get('/members/{user}/edit', [AdminController::class, 'editMember'])->name('members.edit');
-        Route::put('/members/{user}', [AdminController::class, 'updateMember'])->name('members.update');
-        Route::delete('/members/{user}', [AdminController::class, 'destroy'])->name('members.destroy');
+        Route::post('/members/{user}/update', [AdminController::class, 'updateMember'])->name('members.update');
+        Route::post('/members/{user}/destroy', [AdminController::class, 'destroy'])->name('members.destroy');
     });
 });
